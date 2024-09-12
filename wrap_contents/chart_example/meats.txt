@@ -1,0 +1,10 @@
+		data.addRow(['Bologna', 26]);
+		data.addRow(['Ham', 54]);
+		data.addRow(['Turkey', 34]);
+		data.addRow(['Meatballs', 16]);
+		data.addRow(['Salami', 25]);
+		data.addRow(['Chicken', 32]);
+		data.addRow(['Veggie', 3]);
+		data.addRow(['Cheese', 1]);
+		data.addRow(['Sausage', 6]);
+		data.addRow(['Steak', 2]);

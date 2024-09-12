@@ -1,0 +1,34 @@
+<html>
+<head>
+	<script type='text/javascript' src='https://www.google.com/jsapi'></script>
+	<script type='text/javascript'>
+	google.load('visualization', '1', {'packages':['corechart']});
+
+	google.setOnLoadCallback(drawSandwichDistribution);
+
+	function drawSandwichDistribution() {
+		var data = new google.visualization.DataTable();
+		data.addColumn('string', 'Sandwich Meats');
+		data.addColumn('number', 'Preference Count');
+		data.addRow(['Bologna', 26]);
+		data.addRow(['Ham', 54]);
+		data.addRow(['Turkey', 34]);
+		data.addRow(['Meatballs', 16]);
+		data.addRow(['Salami', 25]);
+		data.addRow(['Chicken', 32]);
+		data.addRow(['Veggie', 3]);
+		data.addRow(['Cheese', 1]);
+		data.addRow(['Sausage', 6]);
+		data.addRow(['Steak', 2]);
+		var chart = new google.visualization.PieChart(document.getElementById('sandwich_dist_div'));
+		chart.draw(data, {width: 450, height: 300, title: 'Sandwich meat preferences'});
+	}
+
+	</script>
+</head>
+
+<body>
+	<h1>Sandwich Meat Preferences</h1>
+	<div id='sandwich_dist_div' style='width: 800px; height: 600px;'></div>
+</body>
+</html>
