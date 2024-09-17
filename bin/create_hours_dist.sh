@@ -11,7 +11,7 @@ fi
 
 # Create or clear the hours_dist.html file
 OUTPUT_FILE="$DIR/hours_dist.html"
-> "$OUTPUT_FILE"
+#> "$OUTPUT_FILE"
 
 # Initialize an associative array to count hours
 declare -A hour_counts
@@ -23,45 +23,28 @@ for SUBDIR in "$DIR"/*; do
     if [ -f "$FAILED_LOGIN_FILE" ]; then
       # Extract hours and count occurrences
       while read -r line; do
-        hour=$(echo "$line" | awk '{print $3}')
+        hour=$(echo "$line" | awk '{print substr($3, 1, 2)}')
         ((hour_counts["$hour"]++))
       done < "$FAILED_LOGIN_FILE"
     fi
   fi
 done
 
-# Generate the HTML/JavaScript structure
+# Generate the data section for the column chart
+DATA_FILE=$(mktemp)
 {
-  echo "<!DOCTYPE html>"
-  echo "<html lang=\"en\">"
-  echo "<head>"
-  echo "  <meta charset=\"UTF-8\">"
-  echo "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
-  echo "  <title>Hours Distribution</title>"
-  echo "  <script type=\"text/javascript\" src=\"https://www.gstatic.com/charts/loader.js\"></script>"
-  echo "  <script type=\"text/javascript\">"
-  echo "    google.charts.load('current', {'packages':['corechart']});"
-  echo "    google.charts.setOnLoadCallback(drawChart);"
-  echo "    function drawChart() {"
-  echo "      var data = google.visualization.arrayToDataTable(["
-  echo "        ['Hour', 'Count'],"
-  for hour in "${!hour_counts[@]}"; do
-    echo "        ['$hour', ${hour_counts[$hour]}],"
+  for hour in $(printf "%s\n" "${!hour_counts[@]}" | sort); do
+    echo "data.addRow(['${hour}', ${hour_counts[$hour]}]);"
   done
-  echo "      ]);"
-  echo "      var options = {"
-  echo "        title: 'Hours Distribution',"
-  echo "        pieHole: 0.4,"
-  echo "      };"
-  echo "      var chart = new google.visualization.PieChart(document.getElementById('donutchart'));"
-  echo "      chart.draw(data, options);"
-  echo "    }"
-  echo "  </script>"
-  echo "</head>"
-  echo "<body>"
-  echo "  <div id=\"donutchart\" style=\"width: 900px; height: 500px;\"></div>"
-  echo "</body>"
-  echo "</html>"
-} >> "$OUTPUT_FILE"
+} > "$DATA_FILE"
+
+# Remove the trailing comma from the last data.addRow line
+sed -i '$ s/,$//' "$DATA_FILE"
+
+# Wrap the data section with the header and footer
+./bin/wrap_contents.sh "$DATA_FILE" html_components/hours_dist "$OUTPUT_FILE"
+
+# Clean up the temporary data file
+rm "$DATA_FILE"
 
 echo "Hours distribution HTML generated at $OUTPUT_FILE"
