@@ -1,0 +1,19 @@
+	<!-- ++++++++++++ START OF USERNAME HEADER +++++++++++++++++++++++++++++++ -->
+	
+	google.setOnLoadCallback(drawUsernameDistribution);
+
+	function drawUsernameDistribution() {
+		var data = new google.visualization.DataTable();
+		data.addColumn('string', 'Username');
+		data.addColumn('number', 'Number of failed logins');
+
+	<!-- ++++++++++++ END OF USERNAME HEADER +++++++++++++++++++++++++++++++ -->
+data.addRows([
+]);
+	<!-- ++++++++++++ START OF USERNAME FOOTER +++++++++++++++++++++++++++++++ -->
+
+		var chart = new google.visualization.PieChart(document.getElementById('username_dist_div'));
+		chart.draw(data, {width: 800, height: 550, title: 'Failed logins by username'});
+	}
+
+	<!-- ++++++++++++ END OF USERNAME FOOTER +++++++++++++++++++++++++++++++ -->

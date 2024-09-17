@@ -9,9 +9,9 @@ fi
 # Directory containing the sub-directories
 DIR="$1"
 
-# Create or clear the username_dist.html file
+# Create or clear the username_dist.html file in the specified directory
 OUTPUT_FILE="$DIR/username_dist.html"
-> "$OUTPUT_FILE"
+#> "$OUTPUT_FILE"
 
 # Initialize an associative array to count usernames
 declare -A username_counts
@@ -40,12 +40,11 @@ DATA_FILE=$(mktemp)
   echo "]);"
 } > "$DATA_FILE"
 
+# Remove the trailing comma from the last data.addRow line
+sed -i '$ s/,$//' "$DATA_FILE"
+
 # Wrap the data section with the header and footer
 ./bin/wrap_contents.sh "$DATA_FILE" html_components/username_dist "$OUTPUT_FILE"
 
 # Clean up the temporary data file
 rm "$DATA_FILE"
-
-# Debug: Output the contents of the username_dist.html file
-echo "Contents of $OUTPUT_FILE:"
-cat "$OUTPUT_FILE"
