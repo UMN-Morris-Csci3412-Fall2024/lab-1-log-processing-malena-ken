@@ -8,7 +8,7 @@ cd "$DIR" || exit
 
 
 # Process the log files
-find . -type f | xargs cat | awk '
+find . -type f -print0| xargs -0 cat | awk '
     /Failed password/ {
         if ($9 == "invalid") {
             print $1, $2, substr($3, 1, 2), $11, $13
