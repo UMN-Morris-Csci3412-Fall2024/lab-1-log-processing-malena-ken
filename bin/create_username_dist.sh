@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Set the directory variable
-DIR=$1
-
-# Check if the provided argument is a directory
-if [ ! -d "$DIR" ]; then
-  echo "Error: $DIR is not a directory"
+# Check if the correct number of arguments is provided
+if [ "$#" -ne 1 ]; then
+  echo "Usage: $0 <directory>"
   exit 1
 fi
+
+# Directory containing the sub-directories
+DIR="$1"
 
 # Create or clear the username_dist.html file
 OUTPUT_FILE="$DIR/username_dist.html"
@@ -30,38 +30,22 @@ for SUBDIR in "$DIR"/*; do
   fi
 done
 
-# Generate the HTML/JavaScript structure
+# Generate the data section for the pie chart
+DATA_FILE=$(mktemp)
 {
-  echo "<!DOCTYPE html>"
-  echo "<html lang=\"en\">"
-  echo "<head>"
-  echo "  <meta charset=\"UTF-8\">"
-  echo "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
-  echo "  <title>Username Distribution</title>"
-  echo "  <script type=\"text/javascript\" src=\"https://www.gstatic.com/charts/loader.js\"></script>"
-  echo "  <script type=\"text/javascript\">"
-  echo "    google.charts.load('current', {'packages':['corechart']});"
-  echo "    google.charts.setOnLoadCallback(drawChart);"
-  echo "    function drawChart() {"
-  echo "      var data = google.visualization.arrayToDataTable(["
-  echo "        ['Username', 'Count'],"
+  echo "data.addRows(["
   for username in "${!username_counts[@]}"; do
-    echo "        ['$username', ${username_counts[$username]}],"
+    echo "  ['${username}', ${username_counts[$username]}],"
   done
-  echo "      ]);"
-  echo "      var options = {"
-  echo "        title: 'Username Distribution',"
-  echo "        pieHole: 0.4,"
-  echo "      };"
-  echo "      var chart = new google.visualization.PieChart(document.getElementById('donutchart'));"
-  echo "      chart.draw(data, options);"
-  echo "    }"
-  echo "  </script>"
-  echo "</head>"
-  echo "<body>"
-  echo "  <div id=\"donutchart\" style=\"width: 900px; height: 500px;\"></div>"
-  echo "</body>"
-  echo "</html>"
-} >> "$OUTPUT_FILE"
+  echo "]);"
+} > "$DATA_FILE"
 
-echo "Username distribution HTML generated at $OUTPUT_FILE"
+# Wrap the data section with the header and footer
+./bin/wrap_contents.sh "$DATA_FILE" html_components/username_dist "$OUTPUT_FILE"
+
+# Clean up the temporary data file
+rm "$DATA_FILE"
+
+# Debug: Output the contents of the username_dist.html file
+echo "Contents of $OUTPUT_FILE:"
+cat "$OUTPUT_FILE"

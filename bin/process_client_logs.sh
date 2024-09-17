@@ -1,23 +1,23 @@
 #!/bin/bash
 
-# Set the directory variable
-DIR=$1
+# Directory containing the log files
+DIR="$1"
 
-# Check if the provided argument is a directory
-if [ ! -d "$DIR" ]; then
-echo "Error: $DIR is not a directory"
-exit 1
-fi
+# Move to the specified directory
+cd "$DIR" || exit
 
-# Create or clear the failed_login_data.txt file
-> "$DIR/failed_login_data.txt"
 
-# Process each log file in the directory
-for FILE in "$DIR"/*; do
-if [ -f "$FILE" ]; then
-    # Extract and format the failed login data
-    grep "Failed password" "$FILE" | awk '{print $1, $2, substr($3, 1, 2), $9, $11}' >> "$DIR/failed_login_data.txt"
-fi
-done
+# Process the log files
+find . -type f | xargs cat | awk '
+    /Failed password/ {
+        if ($9 == "invalid") {
+            print $1, $2, substr($3, 1, 2), $11, $13
+        } else {
+            print $1, $2, substr($3, 1, 2), $9, $11
+        }
+    }
+' > failed_login_data.txt
 
-echo "Processing complete. Output written to $DIR/failed_login_data.txt"
+
+# Debug: Output the contents of the failed_login_data.txt file
+# cat failed_login_data.txt
