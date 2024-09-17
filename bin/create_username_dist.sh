@@ -33,11 +33,9 @@ done
 # Generate the data section for the pie chart
 DATA_FILE=$(mktemp)
 {
-  echo "data.addRows(["
-  for username in "${!username_counts[@]}"; do
-    echo "  ['${username}', ${username_counts[$username]}],"
+  for username in $(printf "%s\n" "${!username_counts[@]}" | sort); do
+    echo "data.addRow(['${username}', ${username_counts[$username]}]);"
   done
-  echo "]);"
 } > "$DATA_FILE"
 
 # Remove the trailing comma from the last data.addRow line
