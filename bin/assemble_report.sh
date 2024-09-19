@@ -11,7 +11,7 @@ DIR="$1"
 
 # Create or clear the failed_login_summary.html file in the specified directory
 OUTPUT_FILE="$DIR/failed_login_summary.html"
-> "$OUTPUT_FILE"
+#> "$OUTPUT_FILE"
 
 # Temporary file to hold the combined contents
 TEMP_FILE=$(mktemp)
